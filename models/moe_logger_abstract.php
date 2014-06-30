@@ -29,6 +29,8 @@ abstract class moe_logger_abstract {
   protected $sOutputFieldSepatator  = ' ';
   protected $sOutputNewline         = "\n";
   protected $sOutputKeySeparator    = ':';
+  protected $bOutputContextPretty   = false;
+  protected $bOutputMultiline       = false;
   
   abstract public function execute();
 
@@ -40,6 +42,12 @@ abstract class moe_logger_abstract {
     
   public function getLogAsString()
   {
+    if( $this->getOutputMultiline() === true ) {
+      $ret  = "<pre>".$this->sOutputNewline;
+      $ret .= print_r( $this->getLog(), true );
+      $ret .= "<pre>".$this->sOutputNewline;
+      return $ret;
+    }
     $sLog = "";
     foreach( $this->getLog() as $aMessage) {
       foreach( $aMessage as $Key=>$Value) {
@@ -65,6 +73,22 @@ abstract class moe_logger_abstract {
       $this->sOutputWithKey = false;
     }
     if( !empty( $sOutputNewline ) ) $this->sOutputNewline = $sOutputNewline;
+  }
+  
+  public function setOutputMultiline( $bFlag ) {
+    $this->bOutputMultiline = $bFlag;
+  }
+  
+  public function getOutputMultiline( ) {
+    return $this->bOutputMultiline;
+  }
+  
+  public function setContextPretty( $bFlag ) {
+    $this->bOutputContextPretty = $bFlag;
+  }
+  
+  public function getContextPretty( ) {
+    return $this->bOutputContextPretty;
   }
   
   public function getLog() {
@@ -133,6 +157,12 @@ abstract class moe_logger_abstract {
                         'Message' => $this->interpolate($message, $context),
                         'Context' => json_encode( $context ),
                        );
+    if( $this->getContextPretty() === true ) {
+      $_aMessage['Context'] = $this->sOutputNewline . print_r( $context, true );
+    }
+    if( $this->getOutputMultiline( ) === true ) {
+      $_aMessage['Context'] = $context;
+    }
     $this->aMessages[] = $_aMessage;
   }
   
@@ -256,5 +286,5 @@ abstract class moe_logger_abstract {
     // interpolate replacement values into the message and return
     return strtr($message, $replace);
   }
-  
+
 }
