@@ -3,6 +3,11 @@
 class moe_logger_file extends moe_logger_abstract {
   protected $sFile;
   
+  /*
+   * Contructor
+   * 
+   * @
+   */
   public function __construct( $iMinLoglevel, $File ) {
     parent::__construct( $iMinLoglevel );
     
